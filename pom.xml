@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>fr.icy</groupId>
+        <artifactId>pom-icy</artifactId>
+        <version>3.0.0-a.7</version>
+    </parent>
+
+    <groupId>fr.icy.shared</groupId>
+    <artifactId>vtk</artifactId>
+    <version>1.0.0-a.7-SNAPSHOT</version>
+
+    <name>VTK</name>
+    <description>VTK for Icy</description>
+    <url>https://icy.bioimageanalysis.org/</url>
+    <inceptionYear>2026</inceptionYear>
+
+    <scm>
+        <url>https://gitlab.pasteur.fr/bia/icy/shared/vtk</url>
+        <tag>v${project.version}</tag>
+    </scm>
+
+    <issueManagement>
+        <system>GitLab Issues</system>
+        <url>https://gitlab.pasteur.fr/bia/icy/shared/vtk/-/issues</url>
+    </issueManagement>
+    <ciManagement>
+        <system>GitLab CI</system>
+        <url>https://gitlab.pasteur.fr/bia/icy/shared/vtk/-/pipelines</url>
+    </ciManagement>
+
+    <organization>
+        <name>Institut Pasteur</name>
+        <url>https://www.pasteur.fr/</url>
+    </organization>
+
+    <licenses>
+        <license>
+            <name>GNU LGPLv3</name>
+            <url>https://www.gnu.org/licenses/lgpl-3.0</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>tmusset</id>
+            <name>Thomas Musset</name>
+            <url>https://icy.bioimageanalysis.org/author/tmusset/</url>
+            <roles>
+                <role>lead</role>
+                <role>developer</role>
+                <role>debugger</role>
+                <role>reviewer</role>
+                <role>support</role>
+                <role>maintainer</role>
+            </roles>
+        </developer>
+    </developers>
+
+    <contributors>
+        <contributor>
+            <name>Thomas Musset</name>
+            <properties><id>Azargas</id></properties>
+        </contributor>
+    </contributors>
+
+    <mailingLists>
+        <mailingList>
+            <name>Icy</name>
+            <post>icy.team@pasteur.fr</post>
+        </mailingList>
+    </mailingLists>
+
+    <properties>
+        <license.licenseName>GNU LGPLv3</license.licenseName>
+        <license.copyrightOwners>Institut Pasteur</license.copyrightOwners>
+
+        <!-- Source directories for native binaries -->
+        <nativesDirectory>${project.basedir}/src/main/natives</nativesDirectory>
+        <!-- Staging area: natives + auto-generated manifest, one subdir per platform -->
+        <stagingDirectory>${project.build.directory}/natives-staging</stagingDirectory>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>${maven-antrun-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>stage-natives</id>
+                        <phase>prepare-package</phase>
+                        <goals><goal>run</goal></goals>
+                        <configuration>
+                            <target>
+                                <!-- LINUX AMD64 -->
+                                <mkdir dir="${stagingDirectory}/linux-amd64"/>
+                                <zip destfile="${stagingDirectory}/natives-linux-amd64.pack" compress="false" encoding="UTF-8">
+                                    <fileset dir="${nativesDirectory}/linux-amd64" includes="*.so"/>
+                                </zip>
+
+                                <!-- WINDOWS AMD64 -->
+                                <mkdir dir="${stagingDirectory}/windows-amd64"/>
+                                <zip destfile="${stagingDirectory}/natives-windows-amd64.pack" compress="false" encoding="UTF-8">
+                                    <fileset dir="${nativesDirectory}/windows-amd64" includes="*.dll"/>
+                                </zip>
+
+                                <!-- MACOS ARM64 -->
+                                <mkdir dir="${stagingDirectory}/macos-arm64"/>
+                                <zip destfile="${stagingDirectory}/natives-macos-arm64.pack" compress="false" encoding="UTF-8">
+                                    <fileset dir="${nativesDirectory}/macos-arm64" includes="*.dylib"/>
+                                </zip>
+
+                                <!-- MACOS AMD64 -->
+                                <mkdir dir="${stagingDirectory}/macos-amd64"/>
+                                <zip destfile="${stagingDirectory}/natives-macos-amd64.pack" compress="false" encoding="UTF-8">
+                                    <fileset dir="${nativesDirectory}/macos-amd64" includes="*.dylib"/>
+                                </zip>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>${maven-jar-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>natives-linux-amd64</id>
+                        <phase>package</phase>
+                        <goals><goal>jar</goal></goals>
+                        <configuration>
+                            <classifier>natives-linux-amd64</classifier>
+                            <classesDirectory>${stagingDirectory}/</classesDirectory>
+                            <includes>
+                                <include>natives-linux-amd64.pack</include>
+                            </includes>
+                            <forceCreation>true</forceCreation>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>natives-windows-amd64</id>
+                        <phase>package</phase>
+                        <goals><goal>jar</goal></goals>
+                        <configuration>
+                            <classifier>natives-windows-amd64</classifier>
+                            <classesDirectory>${stagingDirectory}/</classesDirectory>
+                            <includes>
+                                <include>natives-windows-amd64.pack</include>
+                            </includes>
+                            <forceCreation>true</forceCreation>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>natives-macos-arm64</id>
+                        <phase>package</phase>
+                        <goals><goal>jar</goal></goals>
+                        <configuration>
+                            <classifier>natives-macos-arm64</classifier>
+                            <classesDirectory>${stagingDirectory}/</classesDirectory>
+                            <includes>
+                                <include>natives-macos-arm64.pack</include>
+                            </includes>
+                            <forceCreation>true</forceCreation>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>natives-macos-amd64</id>
+                        <phase>package</phase>
+                        <goals><goal>jar</goal></goals>
+                        <configuration>
+                            <classifier>natives-macos-amd64</classifier>
+                            <classesDirectory>${stagingDirectory}/</classesDirectory>
+                            <includes>
+                                <include>natives-macos-amd64.pack</include>
+                            </includes>
+                            <forceCreation>true</forceCreation>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.jogamp.gluegen</groupId>
+            <artifactId>gluegen-rt</artifactId>
+            <version>${org.jogamp.gluegen.gluegen-rt.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jogamp.jogl</groupId>
+            <artifactId>jogl-all</artifactId>
+            <version>${org.jogamp.jogl.jogl-all.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>fr.icy.shared</groupId>
+            <artifactId>task</artifactId>
+            <version>${fr.icy.shared.task}</version>
+        </dependency>
+    </dependencies>
+</project>

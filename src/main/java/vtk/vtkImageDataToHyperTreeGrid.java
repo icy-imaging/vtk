@@ -1,0 +1,69 @@
+// java wrapper for vtkImageDataToHyperTreeGrid object
+//
+
+package vtk;
+import vtk.*;
+import java.nio.charset.*;
+
+
+public class vtkImageDataToHyperTreeGrid extends vtkHyperTreeGridAlgorithm
+{
+
+  private native int IsTypeOf_0(byte[] id0, int len0);
+  public int IsTypeOf(String id0)
+  {
+    byte[] bytes0 = id0.getBytes(StandardCharsets.UTF_8);
+    return IsTypeOf_0(bytes0, bytes0.length);
+  }
+
+  private native int IsA_1(byte[] id0, int len0);
+  public int IsA(String id0)
+  {
+    byte[] bytes0 = id0.getBytes(StandardCharsets.UTF_8);
+    return IsA_1(bytes0, bytes0.length);
+  }
+
+  private native long GetNumberOfGenerationsFromBaseType_2(byte[] id0, int len0);
+  public long GetNumberOfGenerationsFromBaseType(String id0)
+  {
+    byte[] bytes0 = id0.getBytes(StandardCharsets.UTF_8);
+    return GetNumberOfGenerationsFromBaseType_2(bytes0, bytes0.length);
+  }
+
+  private native long GetNumberOfGenerationsFromBase_3(byte[] id0, int len0);
+  public long GetNumberOfGenerationsFromBase(String id0)
+  {
+    byte[] bytes0 = id0.getBytes(StandardCharsets.UTF_8);
+    return GetNumberOfGenerationsFromBase_3(bytes0, bytes0.length);
+  }
+
+  private native void SetDepthMax_4(int id0);
+  public void SetDepthMax(int id0)
+  {
+    SetDepthMax_4(id0);
+  }
+
+  private native int GetDepthMax_5();
+  public int GetDepthMax()
+  {
+    return GetDepthMax_5();
+  }
+
+  private native void SetNbColors_6(int id0);
+  public void SetNbColors(int id0)
+  {
+    SetNbColors_6(id0);
+  }
+
+  private native int GetNbColors_7();
+  public int GetNbColors()
+  {
+    return GetNbColors_7();
+  }
+
+  public vtkImageDataToHyperTreeGrid() { super(); }
+
+  public vtkImageDataToHyperTreeGrid(long id) { super(id); }
+  public native long   VTKInit();
+
+}

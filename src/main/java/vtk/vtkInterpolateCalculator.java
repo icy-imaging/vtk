@@ -1,0 +1,62 @@
+// java wrapper for vtkInterpolateCalculator object
+//
+
+package vtk;
+import vtk.*;
+import java.nio.charset.*;
+
+
+public class vtkInterpolateCalculator extends vtkCellAttributeCalculator
+{
+
+  private native int IsTypeOf_0(byte[] id0, int len0);
+  public int IsTypeOf(String id0)
+  {
+    byte[] bytes0 = id0.getBytes(StandardCharsets.UTF_8);
+    return IsTypeOf_0(bytes0, bytes0.length);
+  }
+
+  private native int IsA_1(byte[] id0, int len0);
+  public int IsA(String id0)
+  {
+    byte[] bytes0 = id0.getBytes(StandardCharsets.UTF_8);
+    return IsA_1(bytes0, bytes0.length);
+  }
+
+  private native long GetNumberOfGenerationsFromBaseType_2(byte[] id0, int len0);
+  public long GetNumberOfGenerationsFromBaseType(String id0)
+  {
+    byte[] bytes0 = id0.getBytes(StandardCharsets.UTF_8);
+    return GetNumberOfGenerationsFromBaseType_2(bytes0, bytes0.length);
+  }
+
+  private native long GetNumberOfGenerationsFromBase_3(byte[] id0, int len0);
+  public long GetNumberOfGenerationsFromBase(String id0)
+  {
+    byte[] bytes0 = id0.getBytes(StandardCharsets.UTF_8);
+    return GetNumberOfGenerationsFromBase_3(bytes0, bytes0.length);
+  }
+
+  private native void Evaluate_4(vtkIdTypeArray id0,vtkDataArray id1,vtkDataArray id2);
+  public void Evaluate(vtkIdTypeArray id0,vtkDataArray id1,vtkDataArray id2)
+  {
+    Evaluate_4(id0,id1,id2);
+  }
+
+  private native boolean AnalyticDerivative_5();
+  public boolean AnalyticDerivative()
+  {
+    return AnalyticDerivative_5();
+  }
+
+  private native void EvaluateDerivative_6(vtkIdTypeArray id0,vtkDataArray id1,vtkDataArray id2);
+  public void EvaluateDerivative(vtkIdTypeArray id0,vtkDataArray id1,vtkDataArray id2)
+  {
+    EvaluateDerivative_6(id0,id1,id2);
+  }
+
+  public vtkInterpolateCalculator() { super(); }
+
+  public vtkInterpolateCalculator(long id) { super(id); }
+
+}

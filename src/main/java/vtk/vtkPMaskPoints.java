@@ -1,0 +1,60 @@
+// java wrapper for vtkPMaskPoints object
+//
+
+package vtk;
+import vtk.*;
+import java.nio.charset.*;
+
+
+public class vtkPMaskPoints extends vtkMaskPoints
+{
+
+  private native int IsTypeOf_0(byte[] id0, int len0);
+  public int IsTypeOf(String id0)
+  {
+    byte[] bytes0 = id0.getBytes(StandardCharsets.UTF_8);
+    return IsTypeOf_0(bytes0, bytes0.length);
+  }
+
+  private native int IsA_1(byte[] id0, int len0);
+  public int IsA(String id0)
+  {
+    byte[] bytes0 = id0.getBytes(StandardCharsets.UTF_8);
+    return IsA_1(bytes0, bytes0.length);
+  }
+
+  private native long GetNumberOfGenerationsFromBaseType_2(byte[] id0, int len0);
+  public long GetNumberOfGenerationsFromBaseType(String id0)
+  {
+    byte[] bytes0 = id0.getBytes(StandardCharsets.UTF_8);
+    return GetNumberOfGenerationsFromBaseType_2(bytes0, bytes0.length);
+  }
+
+  private native long GetNumberOfGenerationsFromBase_3(byte[] id0, int len0);
+  public long GetNumberOfGenerationsFromBase(String id0)
+  {
+    byte[] bytes0 = id0.getBytes(StandardCharsets.UTF_8);
+    return GetNumberOfGenerationsFromBase_3(bytes0, bytes0.length);
+  }
+
+  private native long GetController_4();
+  public vtkMultiProcessController GetController()
+  {
+    long temp = GetController_4();
+
+    if (temp == 0) return null;
+    return (vtkMultiProcessController)vtkObjectBase.JAVA_OBJECT_MANAGER.getJavaObject(temp);
+  }
+
+  private native void SetController_5(vtkMultiProcessController id0);
+  public void SetController(vtkMultiProcessController id0)
+  {
+    SetController_5(id0);
+  }
+
+  public vtkPMaskPoints() { super(); }
+
+  public vtkPMaskPoints(long id) { super(id); }
+  public native long   VTKInit();
+
+}

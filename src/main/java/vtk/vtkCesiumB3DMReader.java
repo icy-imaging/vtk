@@ -1,0 +1,67 @@
+// java wrapper for vtkCesiumB3DMReader object
+//
+
+package vtk;
+import vtk.*;
+import java.nio.charset.*;
+
+
+public class vtkCesiumB3DMReader extends vtkMultiBlockDataSetAlgorithm
+{
+
+  private native int IsTypeOf_0(byte[] id0, int len0);
+  public int IsTypeOf(String id0)
+  {
+    byte[] bytes0 = id0.getBytes(StandardCharsets.UTF_8);
+    return IsTypeOf_0(bytes0, bytes0.length);
+  }
+
+  private native int IsA_1(byte[] id0, int len0);
+  public int IsA(String id0)
+  {
+    byte[] bytes0 = id0.getBytes(StandardCharsets.UTF_8);
+    return IsA_1(bytes0, bytes0.length);
+  }
+
+  private native long GetNumberOfGenerationsFromBaseType_2(byte[] id0, int len0);
+  public long GetNumberOfGenerationsFromBaseType(String id0)
+  {
+    byte[] bytes0 = id0.getBytes(StandardCharsets.UTF_8);
+    return GetNumberOfGenerationsFromBaseType_2(bytes0, bytes0.length);
+  }
+
+  private native long GetNumberOfGenerationsFromBase_3(byte[] id0, int len0);
+  public long GetNumberOfGenerationsFromBase(String id0)
+  {
+    byte[] bytes0 = id0.getBytes(StandardCharsets.UTF_8);
+    return GetNumberOfGenerationsFromBase_3(bytes0, bytes0.length);
+  }
+
+  private native void SetFileName_4(byte[] id0, int len0);
+  public void SetFileName(String id0)
+  {
+    byte[] bytes0 = id0.getBytes(StandardCharsets.UTF_8);
+    SetFileName_4(bytes0, bytes0.length);
+  }
+
+  private native byte[] GetFileName_5();
+  public String GetFileName()
+  {
+    return new String(GetFileName_5(), StandardCharsets.UTF_8);
+  }
+
+  private native long GetGLTFReader_6();
+  public vtkGLTFReader GetGLTFReader()
+  {
+    long temp = GetGLTFReader_6();
+
+    if (temp == 0) return null;
+    return (vtkGLTFReader)vtkObjectBase.JAVA_OBJECT_MANAGER.getJavaObject(temp);
+  }
+
+  public vtkCesiumB3DMReader() { super(); }
+
+  public vtkCesiumB3DMReader(long id) { super(id); }
+  public native long   VTKInit();
+
+}
