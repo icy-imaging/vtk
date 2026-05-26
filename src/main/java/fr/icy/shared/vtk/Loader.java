@@ -1,8 +1,8 @@
-package fr.icy.lib.vtk;
+package fr.icy.shared.vtk;
 
-import fr.icy.lib.task.Pipeline;
-import fr.icy.lib.task.TaskExecutionException;
-import fr.icy.lib.task.TaskExecutor;
+import fr.icy.shared.task.Pipeline;
+import fr.icy.shared.task.TaskExecutionException;
+import fr.icy.shared.task.TaskExecutor;
 import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.NonNull;
 

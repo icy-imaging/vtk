@@ -1,6 +1,6 @@
-package fr.icy.lib.vtk;
+package fr.icy.shared.vtk;
 
-import fr.icy.lib.task.Task;
+import fr.icy.shared.task.Task;
 import org.jspecify.annotations.NonNull;
 
 import java.nio.file.Path;
@@ -22,7 +22,7 @@ public final class NativesLoadTask extends Task {
         int i = 0;
         for (final String file : natives) {
             System.load(path.resolve(file).toAbsolutePath().toString());
-            i ++;
+            i++;
             reportProgress((i / n) * 100, "Loading VTK (" + i + " / " + n + ")");
         }
 
