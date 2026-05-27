@@ -12,7 +12,7 @@
 
     <groupId>fr.icy.shared</groupId>
     <artifactId>vtk</artifactId>
-    <version>1.0.0-a.7-SNAPSHOT</version>
+    <version>1.0.0-a.7</version>
 
     <name>VTK</name>
     <description>VTK for Icy</description>
