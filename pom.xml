@@ -7,16 +7,16 @@
     <parent>
         <groupId>fr.icy</groupId>
         <artifactId>pom-icy</artifactId>
-        <version>3.0.0-a.7</version>
+        <version>3.0.0-a.8-SNAPSHOT</version>
     </parent>
 
     <groupId>fr.icy.shared</groupId>
     <artifactId>vtk</artifactId>
-    <version>1.0.0-a.7</version>
+    <version>1.0.0-a.8-SNAPSHOT</version>
 
     <name>VTK</name>
     <description>VTK for Icy</description>
-    <url>https://icy.bioimageanalysis.org/</url>
+    <url>http://icy.fr/</url>
     <inceptionYear>2026</inceptionYear>
 
     <scm>
@@ -51,6 +51,7 @@
             <id>tmusset</id>
             <name>Thomas Musset</name>
             <url>https://icy.bioimageanalysis.org/author/tmusset/</url>
+            <timezone>Europe/Paris</timezone>
             <roles>
                 <role>lead</role>
                 <role>developer</role>
@@ -65,7 +66,10 @@
     <contributors>
         <contributor>
             <name>Thomas Musset</name>
-            <properties><id>Azargas</id></properties>
+            <timezone>Europe/Paris</timezone>
+            <properties>
+                <id>Azargas</id>
+            </properties>
         </contributor>
     </contributors>
 
@@ -86,107 +90,123 @@
         <stagingDirectory>${project.build.directory}/natives-staging</stagingDirectory>
     </properties>
 
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>${maven-antrun-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <id>stage-natives</id>
-                        <phase>prepare-package</phase>
-                        <goals><goal>run</goal></goals>
-                        <configuration>
-                            <target>
-                                <!-- LINUX AMD64 -->
-                                <mkdir dir="${stagingDirectory}/linux-amd64"/>
-                                <zip destfile="${stagingDirectory}/natives-linux-amd64.pack" compress="false" encoding="UTF-8">
-                                    <fileset dir="${nativesDirectory}/linux-amd64" includes="*.so"/>
-                                </zip>
+    <profiles>
+        <profile>
+            <id>generate-natives</id>
 
-                                <!-- WINDOWS AMD64 -->
-                                <mkdir dir="${stagingDirectory}/windows-amd64"/>
-                                <zip destfile="${stagingDirectory}/natives-windows-amd64.pack" compress="false" encoding="UTF-8">
-                                    <fileset dir="${nativesDirectory}/windows-amd64" includes="*.dll"/>
-                                </zip>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>${maven-antrun-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>stage-natives</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <target>
+                                        <!-- LINUX AMD64 -->
+                                        <mkdir dir="${stagingDirectory}/linux-amd64"/>
+                                        <zip destfile="${stagingDirectory}/natives-linux-amd64.pack" compress="false" encoding="UTF-8">
+                                            <fileset dir="${nativesDirectory}/linux-amd64" includes="*.so"/>
+                                        </zip>
 
-                                <!-- MACOS ARM64 -->
-                                <mkdir dir="${stagingDirectory}/macos-arm64"/>
-                                <zip destfile="${stagingDirectory}/natives-macos-arm64.pack" compress="false" encoding="UTF-8">
-                                    <fileset dir="${nativesDirectory}/macos-arm64" includes="*.dylib"/>
-                                </zip>
+                                        <!-- WINDOWS AMD64 -->
+                                        <mkdir dir="${stagingDirectory}/windows-amd64"/>
+                                        <zip destfile="${stagingDirectory}/natives-windows-amd64.pack" compress="false" encoding="UTF-8">
+                                            <fileset dir="${nativesDirectory}/windows-amd64" includes="*.dll"/>
+                                        </zip>
 
-                                <!-- MACOS AMD64 -->
-                                <mkdir dir="${stagingDirectory}/macos-amd64"/>
-                                <zip destfile="${stagingDirectory}/natives-macos-amd64.pack" compress="false" encoding="UTF-8">
-                                    <fileset dir="${nativesDirectory}/macos-amd64" includes="*.dylib"/>
-                                </zip>
-                            </target>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+                                        <!-- MACOS ARM64 -->
+                                        <mkdir dir="${stagingDirectory}/macos-arm64"/>
+                                        <zip destfile="${stagingDirectory}/natives-macos-arm64.pack" compress="false" encoding="UTF-8">
+                                            <fileset dir="${nativesDirectory}/macos-arm64" includes="*.dylib"/>
+                                        </zip>
 
-            <plugin>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>${maven-jar-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <id>natives-linux-amd64</id>
-                        <phase>package</phase>
-                        <goals><goal>jar</goal></goals>
-                        <configuration>
-                            <classifier>natives-linux-amd64</classifier>
-                            <classesDirectory>${stagingDirectory}/</classesDirectory>
-                            <includes>
-                                <include>natives-linux-amd64.pack</include>
-                            </includes>
-                            <forceCreation>true</forceCreation>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>natives-windows-amd64</id>
-                        <phase>package</phase>
-                        <goals><goal>jar</goal></goals>
-                        <configuration>
-                            <classifier>natives-windows-amd64</classifier>
-                            <classesDirectory>${stagingDirectory}/</classesDirectory>
-                            <includes>
-                                <include>natives-windows-amd64.pack</include>
-                            </includes>
-                            <forceCreation>true</forceCreation>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>natives-macos-arm64</id>
-                        <phase>package</phase>
-                        <goals><goal>jar</goal></goals>
-                        <configuration>
-                            <classifier>natives-macos-arm64</classifier>
-                            <classesDirectory>${stagingDirectory}/</classesDirectory>
-                            <includes>
-                                <include>natives-macos-arm64.pack</include>
-                            </includes>
-                            <forceCreation>true</forceCreation>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>natives-macos-amd64</id>
-                        <phase>package</phase>
-                        <goals><goal>jar</goal></goals>
-                        <configuration>
-                            <classifier>natives-macos-amd64</classifier>
-                            <classesDirectory>${stagingDirectory}/</classesDirectory>
-                            <includes>
-                                <include>natives-macos-amd64.pack</include>
-                            </includes>
-                            <forceCreation>true</forceCreation>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+                                        <!-- MACOS AMD64 -->
+                                        <mkdir dir="${stagingDirectory}/macos-amd64"/>
+                                        <zip destfile="${stagingDirectory}/natives-macos-amd64.pack" compress="false" encoding="UTF-8">
+                                            <fileset dir="${nativesDirectory}/macos-amd64" includes="*.dylib"/>
+                                        </zip>
+                                    </target>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <plugin>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <version>${maven-jar-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>natives-linux-amd64</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                                <configuration>
+                                    <classifier>natives-linux-amd64</classifier>
+                                    <classesDirectory>${stagingDirectory}/</classesDirectory>
+                                    <includes>
+                                        <include>natives-linux-amd64.pack</include>
+                                    </includes>
+                                    <forceCreation>true</forceCreation>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>natives-windows-amd64</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                                <configuration>
+                                    <classifier>natives-windows-amd64</classifier>
+                                    <classesDirectory>${stagingDirectory}/</classesDirectory>
+                                    <includes>
+                                        <include>natives-windows-amd64.pack</include>
+                                    </includes>
+                                    <forceCreation>true</forceCreation>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>natives-macos-arm64</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                                <configuration>
+                                    <classifier>natives-macos-arm64</classifier>
+                                    <classesDirectory>${stagingDirectory}/</classesDirectory>
+                                    <includes>
+                                        <include>natives-macos-arm64.pack</include>
+                                    </includes>
+                                    <forceCreation>true</forceCreation>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>natives-macos-amd64</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                                <configuration>
+                                    <classifier>natives-macos-amd64</classifier>
+                                    <classesDirectory>${stagingDirectory}/</classesDirectory>
+                                    <includes>
+                                        <include>natives-macos-amd64.pack</include>
+                                    </includes>
+                                    <forceCreation>true</forceCreation>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
     <dependencies>
         <dependency>
@@ -200,6 +220,11 @@
             <version>${org.jogamp.jogl.jogl-all.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>fr.icy.shared</groupId>
+            <artifactId>logging</artifactId>
+            <version>${fr.icy.shared.logging.version}</version>
+        </dependency>
         <dependency>
             <groupId>fr.icy.shared</groupId>
             <artifactId>task</artifactId>

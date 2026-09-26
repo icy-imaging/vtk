@@ -1,5 +1,5 @@
 <!-- badges: start -->
-![Version 1.0.0](https://img.shields.io/badge/v1.0.0-alpha_7-royalblue)
+![Version 1.0.0 alpha 8](https://img.shields.io/badge/v1.0.0-alpha_8-royalblue)
 ![Java 17+](https://img.shields.io/badge/OpenJDK-17+-5382A1?labelColor=E76F00)
 [![VTK](https://img.shields.io/badge/VTK-9.4.2-dodgerblue)](https://vtk.org)
 [![License: LGPL v3](https://img.shields.io/badge/LGPLv3-008033?logo=GPLv3&logoSize=auto)](https://www.gnu.org/licenses/lgpl-3.0)
