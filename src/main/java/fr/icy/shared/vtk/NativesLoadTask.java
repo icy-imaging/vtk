@@ -18,12 +18,12 @@
 
 package fr.icy.shared.vtk;
 
+import fr.icy.shared.logging.CustomLevel;
 import fr.icy.shared.task.Task;
 import org.jspecify.annotations.NonNull;
 
 import java.nio.file.Path;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public final class NativesLoadTask extends Task {
@@ -43,13 +43,13 @@ public final class NativesLoadTask extends Task {
         final float n = natives.size();
         float i = 0;
         for (final String file : natives) {
-            if (LOGGER.isLoggable(Level.CONFIG))
-                LOGGER.log(Level.CONFIG, "Trying to load VTK native: " + file);
+            if (LOGGER.isLoggable(CustomLevel.DEBUG))
+                LOGGER.log(CustomLevel.DEBUG, "Trying to load VTK native: " + file);
             System.load(path.resolve(file).toAbsolutePath().toString());
             i++;
             reportProgress((int) ((i / n) * 100f));
-            if (LOGGER.isLoggable(Level.FINE))
-                LOGGER.log(Level.FINE, "Loading VTK (" + (int) i + " / " + (int) n + ")");
+            if (LOGGER.isLoggable(CustomLevel.TRACE))
+                LOGGER.log(CustomLevel.TRACE, "Loading VTK (" + (int) i + " / " + (int) n + ")");
         }
 
         reportProgress(100, "VTK loaded");

@@ -18,6 +18,7 @@
 
 package fr.icy.shared.vtk;
 
+import fr.icy.shared.logging.CustomLevel;
 import fr.icy.shared.task.Task;
 import org.jspecify.annotations.NonNull;
 
@@ -31,7 +32,6 @@ import java.nio.file.*;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -58,15 +58,15 @@ public class NativesExtractionTask extends Task {
         // 1. Extract pack and verify it
         final LinkedHashMap<String, byte[]> data = readNativesPack(natives);
         long ms = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - t0);
-        if (LOGGER.isLoggable(Level.CONFIG))
-            LOGGER.log(Level.CONFIG, String.format("Verified natives.pack in %d ms", ms));
+        if (LOGGER.isLoggable(CustomLevel.DEBUG))
+            LOGGER.log(CustomLevel.DEBUG, String.format("Verified natives.pack in %d ms", ms));
         reportProgress(0, "Verified natives pack");
 
         // 2. Extract natives from pack
         writeAllParallel(data, path);
         ms = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - t0);
-        if (LOGGER.isLoggable(Level.CONFIG))
-            LOGGER.log(Level.CONFIG, String.format("Wrote %d natives from natives.pack in %d ms", natives.size(), ms));
+        if (LOGGER.isLoggable(CustomLevel.DEBUG))
+            LOGGER.log(CustomLevel.DEBUG, String.format("Wrote %d natives from natives.pack in %d ms", natives.size(), ms));
 
         reportProgress(100, "Extracted VTK");
     }

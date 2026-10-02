@@ -10,102 +10,91 @@ import java.awt.event.MouseWheelEvent;
 /**
  * This interface defines what should be implemented to intercept interaction
  * events and create custom behavior.
+ * <p>
+ * {@link MouseMotionListener} {@link MouseListener} {@link java.awt.event.MouseWheelListener} {@link KeyListener}
+ * <p>
+ * This work was supported by CEA/CESTA
+ * Commissariat a l'Energie Atomique et aux Energies Alternatives,
+ * 15 avenue des Sablieres, CS 60001, 33116 Le Barp, France.
  *
- * @see {@link MouseMotionListener} {@link MouseListener} {@link MouseWheelListener}
- *      {@link KeyListener}
- *
- * @author    Sebastien Jourdain - sebastien.jourdain@kitware.com, Kitware Inc 2012
- * @thanks    This work was supported by CEA/CESTA
- *            Commissariat a l'Energie Atomique et aux Energies Alternatives,
- *            15 avenue des Sablieres, CS 60001, 33116 Le Barp, France.
+ * @author Sebastien Jourdain - sebastien.jourdain@kitware.com, Kitware Inc 2012
  */
 public interface vtkEventInterceptor {
 
-  /**
-   * @param e
-   *            event
-   * @return true if the event has been consumed and should not be forwarded
-   *         to the vtkInteractor
-   */
-  boolean keyPressed(KeyEvent e);
+    /**
+     * @param e event
+     * @return true if the event has been consumed and should not be forwarded
+     * to the vtkInteractor
+     */
+    boolean keyPressed(KeyEvent e);
 
-  /**
-   * @param e
-   *            event
-   * @return true if the event has been consumed and should not be forwarded
-   *         to the vtkInteractor
-   */
-  boolean keyReleased(KeyEvent e);
+    /**
+     * @param e event
+     * @return true if the event has been consumed and should not be forwarded
+     * to the vtkInteractor
+     */
+    boolean keyReleased(KeyEvent e);
 
-  /**
-   * @param e
-   *            event
-   * @return true if the event has been consumed and should not be forwarded
-   *         to the vtkInteractor
-   */
-  boolean keyTyped(KeyEvent e);
+    /**
+     * @param e event
+     * @return true if the event has been consumed and should not be forwarded
+     * to the vtkInteractor
+     */
+    boolean keyTyped(KeyEvent e);
 
-  /**
-   * @param e
-   *            event
-   * @return true if the event has been consumed and should not be forwarded
-   *         to the vtkInteractor
-   */
-  boolean mouseDragged(MouseEvent e);
+    /**
+     * @param e event
+     * @return true if the event has been consumed and should not be forwarded
+     * to the vtkInteractor
+     */
+    boolean mouseDragged(MouseEvent e);
 
-  /**
-   * @param e
-   *            event
-   * @return true if the event has been consumed and should not be forwarded
-   *         to the vtkInteractor
-   */
-  boolean mouseMoved(MouseEvent e);
+    /**
+     * @param e event
+     * @return true if the event has been consumed and should not be forwarded
+     * to the vtkInteractor
+     */
+    boolean mouseMoved(MouseEvent e);
 
-  /**
-   * @param e
-   *            event
-   * @return true if the event has been consumed and should not be forwarded
-   *         to the vtkInteractor
-   */
-  boolean mouseClicked(MouseEvent e);
+    /**
+     * @param e event
+     * @return true if the event has been consumed and should not be forwarded
+     * to the vtkInteractor
+     */
+    boolean mouseClicked(MouseEvent e);
 
-  /**
-   * @param e
-   *            event
-   * @return true if the event has been consumed and should not be forwarded
-   *         to the vtkInteractor
-   */
-  boolean mouseEntered(MouseEvent e);
+    /**
+     * @param e event
+     * @return true if the event has been consumed and should not be forwarded
+     * to the vtkInteractor
+     */
+    boolean mouseEntered(MouseEvent e);
 
-  /**
-   * @param e
-   *            event
-   * @return true if the event has been consumed and should not be forwarded
-   *         to the vtkInteractor
-   */
-  boolean mouseExited(MouseEvent e);
+    /**
+     * @param e event
+     * @return true if the event has been consumed and should not be forwarded
+     * to the vtkInteractor
+     */
+    boolean mouseExited(MouseEvent e);
 
-  /**
-   * @param e
-   *            event
-   * @return true if the event has been consumed and should not be forwarded
-   *         to the vtkInteractor
-   */
-  boolean mousePressed(MouseEvent e);
+    /**
+     * @param e event
+     * @return true if the event has been consumed and should not be forwarded
+     * to the vtkInteractor
+     */
+    boolean mousePressed(MouseEvent e);
 
-  /**
-   * @param e
-   *            event
-   * @return true if the event has been consumed and should not be forwarded
-   *         to the vtkInteractor
-   */
-  boolean mouseReleased(MouseEvent e);
+    /**
+     * @param e event
+     * @return true if the event has been consumed and should not be forwarded
+     * to the vtkInteractor
+     */
+    boolean mouseReleased(MouseEvent e);
 
-  /**
-   * @param e
-   *            event
-   * @return true if the event has been consumed and should not be forwarded
-   *         to the vtkInteractor
-   */
-  boolean mouseWheelMoved(MouseWheelEvent e);
+    /**
+     * @param e event
+     * @return true if the event has been consumed and should not be forwarded
+     * to the vtkInteractor
+     */
+    boolean mouseWheelMoved(MouseWheelEvent e);
 }

@@ -18,6 +18,7 @@
 
 package fr.icy.shared.vtk;
 
+import fr.icy.shared.logging.CustomLevel;
 import fr.icy.shared.task.Pipeline;
 import fr.icy.shared.task.TaskExecutionException;
 import fr.icy.shared.task.TaskExecutor;
@@ -29,7 +30,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedHashSet;
 import java.util.StringTokenizer;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -49,6 +49,8 @@ import java.util.logging.Logger;
  * </ul>
  */
 public final class Loader {
+    private static final Logger LOGGER = Logger.getLogger(Loader.class.getName());
+
     /**
      * Private constructor to prevent instantiation.
      */
@@ -105,7 +107,6 @@ public final class Loader {
      */
     public static synchronized void init() throws RuntimeException {
         if (initialized) return;
-        final Logger logger = Logger.getLogger(Loader.class.getName());
         if (!isCurrentPlatformSupported())
             throw new RuntimeException("Platform (" + currentPlatform() + ") not supported by VTK");
         try {
@@ -133,10 +134,12 @@ public final class Loader {
             catch (final TaskExecutionException e) {
                 e.getFailedTasks().forEach(task ->
                         task.getError().ifPresent(err -> {
-                            if (err instanceof InterruptedException)
-                                logger.log(Level.WARNING, "VTK loading interrupted");
+                            if (err instanceof InterruptedException) {
+                                if (LOGGER.isLoggable(CustomLevel.WARNING))
+                                    LOGGER.log(CustomLevel.WARNING, "VTK loading interrupted");
+                            }
                             else
-                                logger.log(Level.SEVERE, "Failed to load VTK", err);
+                                LOGGER.log(CustomLevel.ERROR, "Failed to load VTK", err);
                         })
                 );
                 throw e;

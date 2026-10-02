@@ -12,116 +12,119 @@ import vtk.rendering.vtkAbstractComponent;
 /**
  * Provide AWT based vtk rendering component
  *
- * @authors Sebastien Jourdain - sebastien.jourdain@kitware.com
- *          Joachim Pouderoux - joachim.pouderoux@kitware.com
+ * @author Sebastien Jourdain - sebastien.jourdain@kitware.com
+ * @author Joachim Pouderoux - joachim.pouderoux@kitware.com
  */
 public class vtkAwtComponent extends vtkAbstractComponent<Canvas> {
-  protected vtkInternalAwtComponent uiComponent;
-  protected boolean isWindowCreated;
-  protected Runnable onWindowCreatedCallback;
+    protected vtkInternalAwtComponent uiComponent;
+    protected boolean isWindowCreated;
+    protected Runnable onWindowCreatedCallback;
 
-  public vtkAwtComponent() {
-    this(new vtkRenderWindow());
-  }
-
-  public vtkAwtComponent(vtkRenderWindow renderWindowToUse) {
-    super(renderWindowToUse);
-    this.isWindowCreated = false;
-    this.uiComponent = new vtkInternalAwtComponent(this);
-    this.uiComponent.addComponentListener(new ComponentAdapter() {
-
-      public void componentResized(ComponentEvent arg0) {
-        Dimension size = vtkAwtComponent.this.uiComponent.getSize();
-        vtkAwtComponent.this.setSize(size.width, size.height);
-      }
-    });
-  }
-
-  public void Render() {
-    // Make sure we can render
-    if (inRenderCall || renderer == null || renderWindow == null) {
-      return;
+    public vtkAwtComponent() {
+        this(new vtkRenderWindow());
     }
 
-    // Try to render
-    try {
-      lock.lockInterruptibly();
-      inRenderCall = true;
+    public vtkAwtComponent(vtkRenderWindow renderWindowToUse) {
+        super(renderWindowToUse);
+        this.isWindowCreated = false;
+        this.uiComponent = new vtkInternalAwtComponent(this);
+        this.uiComponent.addComponentListener(new ComponentAdapter() {
 
-      // Initialize the window only once
-      if (!isWindowCreated) {
-        uiComponent.RenderCreate(renderWindow);
-        setSize(uiComponent.getWidth(), uiComponent.getHeight());
-        isWindowCreated = true;
-      }
-
-      // Trigger the real render
-      renderWindow.Render();
-
-      // Execute callback if need be
-      if(this.onWindowCreatedCallback != null) {
-        this.onWindowCreatedCallback.run();
-        this.onWindowCreatedCallback = null;
-      }
-    } catch (InterruptedException e) {
-      // Nothing that we can do except skipping execution
-    } finally {
-      lock.unlock();
-      inRenderCall = false;
+            public void componentResized(ComponentEvent arg0) {
+                Dimension size = vtkAwtComponent.this.uiComponent.getSize();
+                vtkAwtComponent.this.setSize(size.width, size.height);
+            }
+        });
     }
-  }
 
-  public Canvas getComponent() {
-    return this.uiComponent;
-  }
+    public void Render() {
+        // Make sure we can render
+        if (inRenderCall || renderer == null || renderWindow == null) {
+            return;
+        }
 
-  public void Delete() {
-    this.lock.lock();
+        // Try to render
+        try {
+            lock.lockInterruptibly();
+            inRenderCall = true;
 
-    // We prevent any further rendering
-    inRenderCall = true;
+            // Initialize the window only once
+            if (!isWindowCreated) {
+                uiComponent.RenderCreate(renderWindow);
+                setSize(uiComponent.getWidth(), uiComponent.getHeight());
+                isWindowCreated = true;
+            }
 
-    if (this.uiComponent.getParent() != null) {
-      this.uiComponent.getParent().remove(this.uiComponent);
+            // Trigger the real render
+            renderWindow.Render();
+
+            // Execute callback if need be
+            if (this.onWindowCreatedCallback != null) {
+                this.onWindowCreatedCallback.run();
+                this.onWindowCreatedCallback = null;
+            }
+        }
+        catch (InterruptedException e) {
+            // Nothing that we can do except skipping execution
+        }
+        finally {
+            lock.unlock();
+            inRenderCall = false;
+        }
     }
-    super.Delete();
 
-    // On linux we prefer to have a memory leak instead of a crash
-    if (!this.renderWindow.GetClassName().equals("vtkXOpenGLRenderWindow")) {
-      this.renderWindow = null;
-    } else {
-      System.out.println("The renderwindow has been kept around to prevent a crash");
+    public Canvas getComponent() {
+        return this.uiComponent;
     }
-    this.lock.unlock();
-    vtkObject.JAVA_OBJECT_MANAGER.gc(false);
-  }
 
-  /**
-   * @return true if the graphical component has been properly set and
-   *         operation can be performed on it.
-   */
-  public boolean isWindowSet() {
-    return this.isWindowCreated;
-  }
+    public void Delete() {
+        this.lock.lock();
 
-  /**
-   * Set a callback that gets called once the window is properly created and can be
-   * customized in its settings.
-   *
-   * Once called the callback will be released.
-   *
-   * @param callback
-   */
-  public void setWindowReadyCallback(Runnable callback) {
-    this.onWindowCreatedCallback = callback;
-  }
+        // We prevent any further rendering
+        inRenderCall = true;
 
-  /**
-   * Just allow class in same package to affect inRenderCall boolean
-   *
-   * @param value
-   */
-  protected void updateInRenderCall(boolean value) {
-    this.inRenderCall = value;
-  }
+        if (this.uiComponent.getParent() != null) {
+            this.uiComponent.getParent().remove(this.uiComponent);
+        }
+        super.Delete();
+
+        // On linux we prefer to have a memory leak instead of a crash
+        if (!this.renderWindow.GetClassName().equals("vtkXOpenGLRenderWindow")) {
+            this.renderWindow = null;
+        }
+        else {
+            System.out.println("The renderwindow has been kept around to prevent a crash");
+        }
+        this.lock.unlock();
+        vtkObject.JAVA_OBJECT_MANAGER.gc(false);
+    }
+
+    /**
+     * @return true if the graphical component has been properly set and
+     * operation can be performed on it.
+     */
+    public boolean isWindowSet() {
+        return this.isWindowCreated;
+    }
+
+    /**
+     * Set a callback that gets called once the window is properly created and can be
+     * customized in its settings.
+     * <p>
+     * Once called the callback will be released.
+     *
+     * @param callback
+     */
+    public void setWindowReadyCallback(Runnable callback) {
+        this.onWindowCreatedCallback = callback;
+    }
+
+    /**
+     * Just allow class in same package to affect inRenderCall boolean
+     *
+     * @param value
+     */
+    protected void updateInRenderCall(boolean value) {
+        this.inRenderCall = value;
+    }
 }
