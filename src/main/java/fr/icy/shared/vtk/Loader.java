@@ -22,6 +22,7 @@ import fr.icy.shared.logging.CustomLevel;
 import fr.icy.shared.task.Pipeline;
 import fr.icy.shared.task.TaskExecutionException;
 import fr.icy.shared.task.TaskExecutor;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.NonNull;
 
@@ -69,6 +70,11 @@ public final class Loader {
 
     private static volatile boolean initialized = false;
 
+    @ApiStatus.Experimental
+    private static volatile boolean isLoading = false;
+    @ApiStatus.Experimental
+    private static volatile boolean isUsable = false;
+
     /**
      * Determines whether the current platform is supported.
      * This method retrieves the platform information using the {@code currentPlatform()} method
@@ -83,32 +89,45 @@ public final class Loader {
     }
 
     /**
-     * Initializes the environment for loading native libraries. This method must be invoked
-     * to ensure that the required native libraries are loaded and ready for use.
+     * Initializes the environment for loading the VTK native libraries. This method should be
+     * invoked before any VTK feature is used, so the required native libraries are extracted
+     * (when needed) and loaded.
      * <p>
-     * The initialization process involves the following:
-     * 1. Checks if the platform is supported using {@link #isCurrentPlatformSupported()}.
-     * If the platform is not supported, throws a {@code RuntimeException}.
-     * 2. Sets up a cache directory for library extraction by invoking {@link #setupCacheDir()}.
-     * 3. Gets the ordered set of native libraries specific to the current platform using
-     * {@link #getOrderSet()}.
-     * 4. Determines whether the required native libraries are already present in the cache
-     * directory by calling {@link #isCacheComplete(LinkedHashSet, Path)}:
-     * - If the cache is complete, the libraries are loaded sequentially.
-     * - Otherwise, libraries are extracted and loaded.
-     * 5. Marks the system as initialized to avoid redundant operations in further calls.
+     * The method is idempotent and thread-safe (synchronized): only the first invocation performs
+     * the initialization, subsequent calls return immediately. The actual loading runs
+     * asynchronously in the background; use {@link #isLoading()} to know whether loading is in
+     * progress and {@link #isUsable()} to know when the libraries are ready for use.
      * <p>
-     * The method ensures thread safety by synchronizing on the initialization process.
-     * If initialization fails due to any exception during the process, a
-     * {@code RuntimeException} is thrown with the underlying cause.
-     *
-     * @throws RuntimeException if the current platform is unsupported, the native library
-     *                          loading fails, or any other error occurs during initialization.
+     * The initialization performs the following steps:
+     * <ol>
+     *     <li>Marks the loader as initialized and as loading.</li>
+     *     <li>Checks the platform support with {@link #isCurrentPlatformSupported()}. If the
+     *     current platform is not supported, an error is logged, the loader is marked as not
+     *     usable and the method returns early.</li>
+     *     <li>Sets up the versioned, platform-specific cache directory using
+     *     {@link #setupCacheDir()}.</li>
+     *     <li>Builds a pipeline of tasks for the required native libraries: if the cache is
+     *     complete (see {@link #isCacheComplete(LinkedHashSet, Path)}) the libraries are only
+     *     loaded from disk (fast path); otherwise they are first extracted into the cache
+     *     directory and then loaded (slow path, first run only).</li>
+     *     <li>Executes the pipeline in a background thread and marks the libraries as usable
+     *     once it completes without error.</li>
+     * </ol>
+     * <p>
+     * Errors occurring during the process are logged and are not propagated to the caller:
+     * the loader is simply marked as not usable. Note that a failed initialization is not
+     * retried by subsequent calls to this method.
      */
-    public static synchronized void init() throws RuntimeException {
+    public static synchronized void init() {
         if (initialized) return;
-        if (!isCurrentPlatformSupported())
-            throw new RuntimeException("Platform (" + currentPlatform() + ") not supported by VTK");
+        initialized = true; // prevent redundant initialization
+        isLoading = true;
+        if (!isCurrentPlatformSupported()) {
+            LOGGER.log(CustomLevel.ERROR, "Current platform (" + currentPlatform() + ") is not supported by VTK.");
+            isUsable = false;
+            isLoading = false;
+            return;
+        }
         try {
             final Path cacheDir = setupCacheDir();
             final LinkedHashSet<String> natives = getOrderSet();
@@ -128,29 +147,52 @@ public final class Loader {
                 pipeline.addTask(new NativesLoadTask(natives, cacheDir));
             }
 
-            try {
-                executor.execute(pipeline);
-            }
-            catch (final TaskExecutionException e) {
-                e.getFailedTasks().forEach(task ->
-                        task.getError().ifPresent(err -> {
-                            if (err instanceof InterruptedException) {
-                                if (LOGGER.isLoggable(CustomLevel.WARNING))
-                                    LOGGER.log(CustomLevel.WARNING, "VTK loading interrupted");
-                            }
-                            else
-                                LOGGER.log(CustomLevel.ERROR, "Failed to load VTK", err);
-                        })
-                );
-                throw e;
-            }
+            new Thread(() -> {
+                boolean hasError = false;
+                try {
+                    executor.execute(pipeline);
+                }
+                catch (final TaskExecutionException e) {
+                    if (!e.getFailedTasks().isEmpty()) {
+                        hasError = true;
+                        e.getFailedTasks().forEach(task ->
+                                task.getError().ifPresent(err -> {
+                                    if (err instanceof InterruptedException) {
+                                        if (LOGGER.isLoggable(CustomLevel.WARNING))
+                                            LOGGER.log(CustomLevel.WARNING, "VTK loading interrupted.");
+                                    }
+                                    else
+                                        LOGGER.log(CustomLevel.ERROR, "Failed to load VTK.", err);
+                                })
+                        );
+                    }
+                    //throw e;
+                }
+                finally {
+                    isUsable = !hasError;
+                    isLoading = false;
+                }
+            }).start();
 
-            initialized = true;
+            //initialized = true;
         }
-        catch (final Exception e) {
-            initialized = false;
-            throw new RuntimeException("Failed to initialize native libraries", e);
+        catch (final Throwable t) {
+            //initialized = false;
+            //throw new RuntimeException("Failed to initialize native libraries", t);
+            LOGGER.log(CustomLevel.ERROR, "Failed to initialize native libraries.", t);
+            isUsable = false;
+            isLoading = false;
         }
+    }
+
+    @ApiStatus.Experimental
+    public static synchronized boolean isUsable() {
+        return isUsable;
+    }
+
+    @ApiStatus.Experimental
+    public static synchronized boolean isLoading() {
+        return isLoading;
     }
 
     /**
